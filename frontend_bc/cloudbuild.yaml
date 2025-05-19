@@ -4,20 +4,21 @@ steps:
     args:
       - '-c'
       - |
-        echo "Check if frontend files changed..."
+        echo "Checking for frontend changes..."
         git fetch origin main
         CHANGED_FILES=$(git diff --name-only $COMMIT_SHA^ $COMMIT_SHA)
+        echo "Changed files:"
         echo "$CHANGED_FILES"
-        echo "$CHANGED_FILES" | grep '^frontend_bc/' || (echo "No frontend changes, skipping build." && exit 0)
-  # Step build frontend di bawah ini hanya jalan kalau ada perubahan di frontend_bc/
+        echo "$CHANGED_FILES" | grep '^frontend_bc/' || (echo "No frontend changes. Skipping build." && exit 0)
+
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
-        gcloud config set app/cloud_build_timeout 1600
         cd frontend_bc
         gcloud app deploy --quiet --no-promote
+
 timeout: 1600s
 options:
   logging: CLOUD_LOGGING_ONLY
