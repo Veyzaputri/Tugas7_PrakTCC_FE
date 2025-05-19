@@ -4,7 +4,7 @@ steps:
     args:
       [
         "-c",
-        "gcloud config set app/cloud_build_timeout 1600 && gcloud app deploy",
+        "gcloud config set app/cloud_build_timeout 1600 && cd frontend_bc && gcloud app deploy --quiet",
       ]
 timeout: "1600s"
 
