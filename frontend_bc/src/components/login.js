@@ -12,7 +12,7 @@ const Login = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "http://localhost:5000/login",
+        `${BASE_URL}/login`,
         { username, password },
         { withCredentials: true }
       );
