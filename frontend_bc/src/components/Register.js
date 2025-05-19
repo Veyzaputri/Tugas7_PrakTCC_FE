@@ -12,7 +12,7 @@ const Register = () => {
   const RegisterUser = async (e) => {
     e.preventDefault();
     try {
-       const response = await API.post("/login", { username, password });
+       const response = await API.post("/register", { username, password });
       navigate("/login");
     } catch (error) {
       if (error.response) setMsg(error.response.data.msg);
