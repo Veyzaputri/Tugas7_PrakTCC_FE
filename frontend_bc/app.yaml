@@ -1,4 +1,2 @@
-runtime: custom
-env: flex
-service: default
-
+runtime: nodejs20
+instance_class: F2
