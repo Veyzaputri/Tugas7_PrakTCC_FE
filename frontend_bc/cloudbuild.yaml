@@ -4,21 +4,21 @@ steps:
     args:
       - '-c'
       - |
-        echo "Checking for frontend changes..."
-        git fetch origin main
+        git fetch origin $BRANCH_NAME
         CHANGED_FILES=$(git diff --name-only $COMMIT_SHA^ $COMMIT_SHA)
         echo "Changed files:"
         echo "$CHANGED_FILES"
-        echo "$CHANGED_FILES" | grep '^frontend_bc/' || (echo "No frontend changes. Skipping build." && exit 0)
 
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    entrypoint: 'bash'
+        echo "$CHANGED_FILES" | grep '^frontend_bc/' || (echo "No frontend changes, skip build." && exit 0)
+
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: "bash"
     args:
-      - '-c'
-      - |
-        cd frontend_bc
-        gcloud app deploy --quiet --no-promote
+      [
+        "-c",
+        "cd frontend_bc && gcloud app deploy --quiet --no-promote",
+      ]
+timeout: "1600s"
 
-timeout: 1600s
 options:
   logging: CLOUD_LOGGING_ONLY
