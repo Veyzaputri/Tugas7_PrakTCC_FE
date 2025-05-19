@@ -1,60 +1,89 @@
-import React, { useState } from 'react'
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import { BASE_URL } from "../utils";
+import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [msg, setMsg] = useState('');
-    const navigate = useNavigate();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [msg, setMsg] = useState("");
+  const navigate = useNavigate();
 
-    const Auth = async (e) => {
-        e.preventDefault();
-        try {
-            await axios.post(`${BASE_URL}/login`, {
-                username: username,
-                password: password
-            });
-                navigate('/notes'); // Pastikan menggunakan useNavigate()
-              
-        } catch (error) {
-            if (error.response) {
-                setMsg(error.response.data.msg);
-            }
-        }
+  const Auth = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/login",
+        { username, password },
+        { withCredentials: true }
+      );
+      localStorage.setItem("accessToken", response.data.accessToken);
+      navigate("/notes");  // navigasi ke frontend route /notes
+    } catch (error) {
+      if (error.response) setMsg(error.response.data.msg);
+      else setMsg("Gagal login");
     }
+  };
 
-    return (
-        <section className="hero has-background-grey-light is-fullheight is-fullwidth">
-            <div className="hero-body">
-                <div className="container">
-                    <div className="columns is-centered">
-                        <div className="column is-4-desktop">
-                            <form onSubmit={Auth} className="box">
-                                <p className="has-text-centered">{msg}</p>
-                                <div className="field mt-5">
-                                    <label className="label">Email or Username</label>
-                                    <div className="controls">
-                                        <input type="text" className="input" placeholder="Username" value={email} onChange={(e) => setEmail(e.target.value)} />
-                                    </div>
-                                </div>
-                                <div className="field mt-5">
-                                    <label className="label">Password</label>
-                                    <div className="controls">
-                                        <input type="password" className="input" placeholder="******" value={password} onChange={(e) => setPassword(e.target.value)} />
-                                    </div>
-                                </div>
-                                <div className="field mt-5">
-                                    <button className="button is-success is-fullwidth">Login</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
+  return (
+    <section className="hero is-fullheight is-fullwidth has-background-light">
+      <div className="hero-body">
+        <div className="container">
+          <div className="box" style={{ maxWidth: "400px", margin: "auto" }}>
+            <h1 className="title has-text-centered">Login</h1>
+
+            {msg && <p className="has-text-danger has-text-centered">{msg}</p>}
+
+            <form onSubmit={Auth}>
+              <div className="field">
+                <label className="label">Username</label>
+                <div className="control">
+                  <input
+                    className="input"
+                    type="text"
+                    placeholder="Username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    required
+                  />
                 </div>
-            </div>
-        </section>
-    )
-}
+              </div>
 
-export default Login
+              <div className="field">
+                <label className="label">Password</label>
+                <div className="control">
+                  <input
+                    className="input"
+                    type="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="field is-grouped is-grouped-centered mt-5">
+                <div className="control">
+                  <button type="submit" className="button is-link">
+                    Login
+                  </button>
+                </div>
+                <div className="control">
+                  <button
+                    type="button"
+                    className="button is-light"
+                    onClick={() => navigate("/register")}
+                  >
+                    Register
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default Login;

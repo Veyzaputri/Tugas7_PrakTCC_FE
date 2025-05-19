@@ -6,94 +6,113 @@ import { BASE_URL } from "../utils";
 function EditNotes() {
     const [creator, setCreator] = useState("");
     const [title, setTitle] = useState("");
-    const[notes, setNotes] = useState("");
+    const [notes, setNotes] = useState("");
     const navigate = useNavigate();
-    const {id} = useParams();
+    const { id } = useParams();
 
-    useEffect(()=>{
-        getUserById();
+    useEffect(() => {
+        getNoteById();
     }, []);
 
-    const updateUser = async (e) =>{
+    const updateNote = async (e) => {
         e.preventDefault();
         try {
-            await axios.patch(`${BASE_URL}/users/${id}`,{
+            const token = localStorage.getItem("accessToken");
+
+            await axios.patch(`${BASE_URL}/edit-notes/${id}`, {
                 creator,
                 title,
                 notes
+            }, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
             });
-            navigate("/");
+
+            navigate("/notes");
         } catch (error) {
             console.log(error);
+            alert("Gagal mengupdate catatan. Pastikan kamu sudah login.");
         }
     };
 
-const getUserById = async () =>{
-    const response = await axios.get(`${BASE_URL}/users/${id}`);
-    setCreator(response.data.creator);
-    setTitle(response.data.title);
-    setNotes(response.data.notes);
-}
+    const getNoteById = async () => {
+        try {
+            const token = localStorage.getItem("accessToken");
 
-  return (
-    <div className="columns mt-5 is-centered">
-  <div className="column is-half">
-    <div className="box p-5">
-      <h1 className="title has-text-centered has-text-info">✏️ Edit Note</h1>
-      <form onSubmit={updateUser}>
-        <div className="field">
-          <label className="label">Creator</label>
-          <div className="control">
-            <input 
-              type="text" 
-              className="input is-medium is-rounded" 
-              value={creator} 
-              onChange={(e) => setCreator(e.target.value)}
-              placeholder="Enter creator name" 
-              required
-            />
-          </div>
+            const response = await axios.get(`${BASE_URL}/notes/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            setCreator(response.data.creator);
+            setTitle(response.data.title);
+            setNotes(response.data.notes);
+        } catch (error) {
+            console.log(error);
+            alert("Gagal mengambil data catatan.");
+        }
+    };
+
+    return (
+        <div className="columns mt-5 is-centered">
+            <div className="column is-half">
+                <div className="box p-5">
+                    <h1 className="title has-text-centered has-text-info">✏️ Edit Note</h1>
+                    <form onSubmit={updateNote}>
+                        <div className="field">
+                            <label className="label">Creator</label>
+                            <div className="control">
+                                <input
+                                    type="text"
+                                    className="input is-medium is-rounded"
+                                    value={creator}
+                                    onChange={(e) => setCreator(e.target.value)}
+                                    placeholder="Enter creator name"
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <div className="field">
+                            <label className="label">Title</label>
+                            <div className="control">
+                                <input
+                                    type="text"
+                                    className="input is-medium is-rounded"
+                                    value={title}
+                                    onChange={(e) => setTitle(e.target.value)}
+                                    placeholder="Enter title"
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <div className="field">
+                            <label className="label">Notes</label>
+                            <div className="control">
+                                <textarea
+                                    className="textarea is-medium is-rounded"
+                                    value={notes}
+                                    onChange={(e) => setNotes(e.target.value)}
+                                    rows="4"
+                                    placeholder="Write your notes here..."
+                                    required
+                                ></textarea>
+                            </div>
+                        </div>
+
+                        <div className="field has-text-centered">
+                            <button type="submit" className="button is-info is-medium is-rounded px-5">
+                                Update
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-
-        <div className="field">
-          <label className="label">Title</label>
-          <div className="control">
-            <input 
-              type="text" 
-              className="input is-medium is-rounded" 
-              value={title} 
-              onChange={(e) => setTitle(e.target.value)} 
-              placeholder="Enter title" 
-              required
-            />
-          </div>
-        </div>
-
-        <div className="field">
-          <label className="label">Notes</label>
-          <div className="control">
-            <textarea 
-              className="textarea is-medium is-rounded"
-              value={notes} 
-              onChange={(e) => setNotes(e.target.value)} 
-              rows="4" 
-              placeholder="Write your notes here..." 
-              required
-            ></textarea>
-          </div>
-        </div>
-
-        <div className="field has-text-centered">
-          <button type="submit" className="button is-info is-medium is-rounded px-5">
-             Update
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-  )
+    );
 }
 
 export default EditNotes;

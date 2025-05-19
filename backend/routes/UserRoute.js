@@ -14,7 +14,7 @@ import { verifyToken } from "../middleware/VerifyToken.js";
 const router = express.Router();
 
 //endpoint akses token
-router.get('/token', refreshToken);
+router.get('/refresh_token', refreshToken);
 //endpoin auth
 router.post('/login', loginHandler);
 router.delete('/logout', logout);

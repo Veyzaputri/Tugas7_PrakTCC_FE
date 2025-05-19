@@ -1,4 +1,4 @@
-import User from "../models/NotesModel.js";
+import User from "../models/UserModel.js";
 import jwt from "jsonwebtoken";
 
 export const refreshToken = async(req, res)=>{
@@ -12,7 +12,7 @@ export const refreshToken = async(req, res)=>{
                 refresh_token:refreshToken
             }
         });
-        if(!user.refresh_token) return res.sendStatus(403);
+        if(!user) return res.sendStatus(403);
         else jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET,(err, decoded)=>{
             if(err) return res.sendStatus(403);
             console.log("sudah lewat 403 ke dua di controller")

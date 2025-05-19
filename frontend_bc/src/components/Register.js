@@ -1,0 +1,54 @@
+import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
+const Register = () => {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [msg, setMsg] = useState("");
+  const navigate = useNavigate();
+
+  const RegisterUser = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post(
+        "http://localhost:5000/register",
+        { username, password },
+        { withCredentials: true }
+      );
+      navigate("/login");
+    } catch (error) {
+      if (error.response) setMsg(error.response.data.msg);
+      else setMsg("Gagal registrasi");
+    }
+  };
+
+  return (
+    <section className="hero is-fullheight is-fullwidth">
+      <div className="hero-body">
+        <form onSubmit={RegisterUser} className="box" style={{ width: "300px", margin: "auto" }}>
+          <p style={{ color: "red", textAlign: "center" }}>{msg}</p>
+          <input
+            type="text"
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+            style={{ marginBottom: "10px" }}
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            style={{ marginBottom: "10px" }}
+          />
+          <button type="submit">Register</button>
+        </form>
+      </div>
+    </section>
+  );
+};
+
+export default Register;
