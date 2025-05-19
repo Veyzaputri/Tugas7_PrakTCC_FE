@@ -13,7 +13,7 @@ const Register = () => {
     e.preventDefault();
     try {
        const response = await API.post("/register", { username, password });
-      navigate("/login");
+      window.location.href = "https://20250519t201744-dot-e-13-450704.uc.r.appspot.com";
     } catch (error) {
       if (error.response) setMsg(error.response.data.msg);
       else setMsg("Gagal registrasi");
