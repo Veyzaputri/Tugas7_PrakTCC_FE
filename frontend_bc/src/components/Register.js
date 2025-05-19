@@ -12,11 +12,7 @@ const Register = () => {
   const RegisterUser = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(
-        "http://localhost:5000/register",
-        { username, password },
-        { withCredentials: true }
-      );
+       const response = await API.post("/login", { username, password });
       navigate("/login");
     } catch (error) {
       if (error.response) setMsg(error.response.data.msg);
