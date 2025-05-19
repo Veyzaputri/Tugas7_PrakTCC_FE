@@ -11,23 +11,34 @@ const NoteList = () => {
   }, []);
 
   const getNotes = async () => {
-    try {
-      // kalau backend pakai cookie, ga perlu Authorization header
-      const response = await API.get("/notes", {
-        withCredentials: true,
-      });
-      setNotes(response.data);
-      setMsg("");
-    } catch (error) {
-      console.error(error);
-      if (error.response && error.response.status === 403) {
-        setMsg("Akses ditolak. Silakan login ulang.");
-        // redirect ke login kalau perlu
-      } else {
-        setMsg("Gagal mengambil data catatan");
-      }
+  try {
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      setMsg("Silakan login terlebih dahulu.");
+      return;
     }
-  };
+
+    const response = await API.get("/notes", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      withCredentials: true,
+    });
+    setNotes(response.data);
+    setMsg("");
+  } catch (error) {
+    console.error(error);
+    if (error.response && error.response.status === 403) {
+      setMsg("Akses ditolak. Silakan login ulang.");
+      // redirect ke login jika perlu
+    } else if (error.response && error.response.status === 401) {
+      setMsg("Token tidak valid atau sudah kadaluwarsa. Silakan login ulang.");
+      // redirect ke login jika perlu
+    } else {
+      setMsg("Gagal mengambil data catatan");
+    }
+  }
+};
 
   const deleteNotes = async (id) => {
     try {
