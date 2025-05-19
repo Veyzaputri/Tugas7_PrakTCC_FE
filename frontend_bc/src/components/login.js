@@ -12,11 +12,7 @@ const Login = () => {
   const Auth = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
-        `${BASE_URL}/login`,
-        { username, password },
-        { withCredentials: true }
-      );
+      const response = await API.post("/login", { username, password });
       localStorage.setItem("accessToken", response.data.accessToken);
       navigate("/notes");  // navigasi ke frontend route /notes
     } catch (error) {
