@@ -1,23 +1,12 @@
 steps:
-  # Step 0: Cek apakah file di folder frontend_bc berubah
-  - name: "alpine"
-    id: "Check Changed Files"
-    entrypoint: "sh"
-    args:
-      - -c
-      - |
-        echo "Checking changed files..."
-        git diff --name-only $COMMIT_SHA~1 $COMMIT_SHA | grep '^frontend_bc/' || exit 0
-
-  # Step 1: Deploy frontend ke App Engine
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
-    id: "Deploy Frontend"
     entrypoint: "bash"
     args:
       [
         "-c",
         "gcloud config set app/cloud_build_timeout 1600 && cd frontend_bc && gcloud app deploy --quiet --no-promote",
       ]
+timeout: "1600s"
 
-  # Step 2: Ambil URL frontend hasil deploy dan update backend (kalau kamu butuh ini tetap)
-  # (Step-step selanjutnya yang kamu pakai untuk update env backend)
+options:
+  logging: CLOUD_LOGGING_ONLY
