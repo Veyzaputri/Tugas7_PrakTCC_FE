@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { Link } from "react-router-dom";
-import { BASE_URL } from "../utils";
+import { API } from "../utils/API"; // pastikan ini sudah ada
 
 const NoteList = () => {
   const [notes, setNotes] = useState([]);
@@ -11,38 +10,28 @@ const NoteList = () => {
     getNotes();
   }, []);
 
-const getNotes = async () => {
-  try {
-    const token = localStorage.getItem("accessToken");
-    const response = await axios.get('http://localhost:5000/notes', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      withCredentials: true,  // kalau backend pakai cookie, ini wajib
-    });
-    setNotes(response.data);
-    setMsg("");
-  } catch (error) {
-    console.error(error);
-    if (error.response && error.response.status === 403) {
-      setMsg("Akses ditolak. Silakan login ulang.");
-      // bisa arahkan ke login jika perlu
-      // navigate("/login");
-    } else {
-      setMsg("Gagal mengambil data catatan");
+  const getNotes = async () => {
+    try {
+      // kalau backend pakai cookie, ga perlu Authorization header
+      const response = await API.get("/notes", {
+        withCredentials: true,
+      });
+      setNotes(response.data);
+      setMsg("");
+    } catch (error) {
+      console.error(error);
+      if (error.response && error.response.status === 403) {
+        setMsg("Akses ditolak. Silakan login ulang.");
+        // redirect ke login kalau perlu
+      } else {
+        setMsg("Gagal mengambil data catatan");
+      }
     }
-  }
-};
-
+  };
 
   const deleteNotes = async (id) => {
     try {
-      const token = localStorage.getItem("accessToken");
-      await axios.delete(`${BASE_URL}/notes/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await API.delete(`/notes/${id}`, { withCredentials: true });
       getNotes();
     } catch (error) {
       console.error(error);
@@ -71,29 +60,30 @@ const getNotes = async () => {
             </tr>
           </thead>
           <tbody>
-            {notes.map((note, index) => (
-              <tr key={note.id}>
-                <td className="has-text-centered">{index + 1}</td>
-                <td>{note.creator}</td>
-                <td>{note.title}</td>
-                <td>{note.notes}</td>
-                <td className="is-flex is-justify-content-center">
-                  <Link
-                    to={`/edit-notes/${note.id}`}
-                    className="button is-small is-info is-light is-rounded mr-2"
-                  >
-                    Edit
-                  </Link>
-                  <button
-                    onClick={() => deleteNotes(note.id)}
-                    className="button is-small is-danger is-light is-rounded"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-            {notes.length === 0 && (
+            {notes.length > 0 ? (
+              notes.map((note, index) => (
+                <tr key={note.id}>
+                  <td className="has-text-centered">{index + 1}</td>
+                  <td>{note.creator}</td>
+                  <td>{note.title}</td>
+                  <td>{note.notes}</td>
+                  <td className="is-flex is-justify-content-center">
+                    <Link
+                      to={`/edit-notes/${note.id}`}
+                      className="button is-small is-info is-light is-rounded mr-2"
+                    >
+                      Edit
+                    </Link>
+                    <button
+                      onClick={() => deleteNotes(note.id)}
+                      className="button is-small is-danger is-light is-rounded"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
               <tr>
                 <td colSpan="5" className="has-text-centered">
                   Tidak ada catatan
