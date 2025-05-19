@@ -1,12 +1,23 @@
 steps:
-  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
-    entrypoint: "bash"
+  - name: 'gcr.io/cloud-builders/git'
+    entrypoint: 'bash'
     args:
-      [
-        "-c",
-        "gcloud config set app/cloud_build_timeout 1600 && cd frontend_bc && gcloud app deploy --quiet --no-promote",
-      ]
-timeout: "1600s"
-
+      - '-c'
+      - |
+        echo "Check if frontend files changed..."
+        git fetch origin main
+        CHANGED_FILES=$(git diff --name-only $COMMIT_SHA^ $COMMIT_SHA)
+        echo "$CHANGED_FILES"
+        echo "$CHANGED_FILES" | grep '^frontend_bc/' || (echo "No frontend changes, skipping build." && exit 0)
+  # Step build frontend di bawah ini hanya jalan kalau ada perubahan di frontend_bc/
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        gcloud config set app/cloud_build_timeout 1600
+        cd frontend_bc
+        gcloud app deploy --quiet --no-promote
+timeout: 1600s
 options:
   logging: CLOUD_LOGGING_ONLY
